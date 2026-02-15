@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(for:*)",
+      "Bash(do:*)",
+      "Bash(if:*)",
+      "Bash([ \"$task_id\" -ne 2 ])",
+      "Bash([ \"$task_id\" -ne 3 ])",
+      "Bash([ \"$task_id\" -ne 4 ])",
+      "Bash([ \"$task_id\" -ne 5 ])",
+      "Bash([ \"$task_id\" -ne 6 ])",
+      "Bash([ \"$task_id\" -ne 7 ])",
+      "Bash([ \"$task_id\" -ne 8 ])",
+      "Bash([ \"$task_id\" -ne 9 ])",
+      "Bash([ \"$task_id\" -ne 10 ])",
+      "Bash([ \"$task_id\" -ne 11 ])",
+      "Bash(then)",
+      "Bash(continue)",
+      "Bash(fi)",
+      "Bash(done)",
+      "Bash(git init:*)",
+      "Bash(git config:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

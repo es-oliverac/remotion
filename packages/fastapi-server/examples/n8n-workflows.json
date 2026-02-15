@@ -1,0 +1,139 @@
+{
+  "name": "Remotion Video Renderer",
+  "nodes": [
+    {
+      "name": "Render Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [250, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "http://remotion-api:8000/api/v1/render/media",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "serve_url",
+              "value": "https://remotion-assets.com/bundle.zip"
+            },
+            {
+              "name": "composition",
+              "value": "MyVideo"
+            },
+            {
+              "name": "input_props",
+              "value": "={{ $json }}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Wait 5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "position": [450, 300],
+      "parameters": {
+        "amount": 5,
+        "unit": "seconds"
+      }
+    },
+    {
+      "name": "Check Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [650, 300],
+      "parameters": {
+        "method": "GET",
+        "url": "=http://remotion-api:8000/api/v1/jobs/{{ $node['Render Video'].json['job_id'] }}"
+      }
+    },
+    {
+      "name": "Is Complete?",
+      "type": "n8n-nodes-base.if",
+      "position": [850, 300],
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $node['Check Status'].json['status'] }}",
+              "value2": "completed"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Download Video",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [1050, 200],
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $node['Check Status'].json['output_url'] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Error",
+      "type": "n8n-nodes-base.noOp",
+      "position": [1050, 400]
+    }
+  ],
+  "connections": {
+    "Render Video": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Check Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Status": {
+      "main": [
+        [
+          {
+            "node": "Is Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Complete?": {
+      "main": [
+        [
+          {
+            "node": "Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

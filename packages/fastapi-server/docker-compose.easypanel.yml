@@ -1,0 +1,58 @@
+version: '3.8'
+
+# Docker Compose optimizado para Easypanel
+# Copia este contenido en Easypanel -> Service -> Compose
+
+services:
+  remotion-api:
+    image: remotion/fastapi-server:latest
+    # O usar build local:
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+
+    container_name: remotion-fastapi
+
+    # Ports - Easypanel maneja esto automáticamente con el proxy
+    ports:
+      - "8000:8000"
+
+    # Volumen para persistir los videos renderizados
+    volumes:
+      - remotion-outputs:/app/outputs
+
+    # Variables de entorno
+    environment:
+      - APP_NAME=Remotion FastAPI Server
+      - DEBUG=false
+      - MAX_CONCURRENT_RENDERS=2
+      - OUTPUT_DIR=/app/outputs
+      - BASE_URL=${BASE_URL:-http://localhost:8000}
+      - MAX_BROWSER_INSTANCES=3
+      - MAX_BROWSER_IDLE_SECONDS=300
+      - JOB_CLEANUP_HOURS=24
+
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    # Restart policy
+    restart: unless-stopped
+
+    # Resource limits (ajustar según tu plan Easypanel)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+volumes:
+  remotion-outputs:
+    driver: local

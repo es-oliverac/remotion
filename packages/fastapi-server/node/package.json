@@ -1,0 +1,17 @@
+{
+  "name": "@remotion/fastapi-node-wrapper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@remotion/renderer": "workspace:*",
+    "remotion": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "serviceName": "remotion-fastapi",
+  "displayName": "Remotion Video Renderer",
+  "description": "FastAPI wrapper for Remotion video rendering",
+  "icon": "https://remotion.dev/logo.png",
+  "containers": [
+    {
+      "name": "api",
+      "image": "remotion/fastapi-server:latest",
+      "ports": [
+        {
+          "containerPort": 8000,
+          "protocol": "TCP"
+        }
+      ],
+      "env": [
+        {
+          "name": "MAX_CONCURRENT_RENDERS",
+          "value": "2",
+          "label": "Max Concurrent Renders",
+          "description": "Number of simultaneous render jobs"
+        },
+        {
+          "name": "MAX_BROWSER_INSTANCES",
+          "value": "3",
+          "label": "Max Browser Instances",
+          "description": "Maximum browser instances in pool"
+        },
+        {
+          "name": "OUTPUT_DIR",
+          "value": "/app/outputs",
+          "label": "Output Directory"
+        },
+        {
+          "name": "BASE_URL",
+          "value": "",
+          "label": "Base URL",
+          "description": "Public base URL for output files"
+        }
+      ],
+      "volumes": [
+        {
+          "name": "outputs",
+          "mountPath": "/app/outputs",
+          "size": "10Gi"
+        }
+      ],
+      "resources": {
+        "memory": "2Gi",
+        "cpu": "2"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "type": "http",
+      "targetPort": 8000,
+      "domain": ""
+    }
+  ]
+}

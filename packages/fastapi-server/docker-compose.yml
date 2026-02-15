@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  remotion-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: remotion-fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      # Persist output files
+      - ./outputs:/app/outputs
+    environment:
+      # Server settings
+      - APP_NAME=Remotion FastAPI Server
+      - DEBUG=false
+      - MAX_CONCURRENT_RENDERS=2
+
+      # Storage settings
+      - OUTPUT_DIR=/app/outputs
+      - BASE_URL=http://localhost:8000  # Cambiar a tu dominio en producción
+
+      # Browser pool settings
+      - MAX_BROWSER_INSTANCES=3
+      - MAX_BROWSER_IDLE_SECONDS=300
+
+      # Job cleanup
+      - JOB_CLEANUP_HOURS=24
+
+      # Node.js settings
+      - NODE_PATH=/usr/bin/node
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Resource limits (ajustar según tu servidor)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Optional: Redis para cola distribuida (descomentar para usar)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: remotion-redis
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+
+volumes:
+  # Optional: para Redis
+  # redis-data:
