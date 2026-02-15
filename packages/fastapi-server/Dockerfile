@@ -1,35 +1,18 @@
 # Multi-stage build for FastAPI + Node.js
 
-# Stage 1: Build Node.js wrapper
+# Stage 1: Prepare Node.js wrapper
 FROM node:lts-bookworm-slim AS node-builder
-
-# Install Chrome dependencies
-RUN apt-get update && apt-get install -y \
-  libnss3 \
-  libdbus-1-3 \
-  libatk1.0-0 \
-  libgbm-dev \
-  libasound2 \
-  libxrandr2 \
-  libxkbcommon-dev \
-  libxfixes3 \
-  libxcomposite1 \
-  libxdamage1 \
-  libatk-bridge2.0-0 \
-  libcups2 \
-  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
-# Copy package files
+# Copy wrapper files
 COPY node/package.json ./
-COPY node/tsconfig.json ./
 COPY node/renderer.ts ./
 
-# Install dependencies and build
-RUN npm install && npm run build
+# Install dependencies
+RUN npm install
 
-# Stage 2: Python runtime
+# Stage 2: Python runtime with Remotion
 FROM python:3.11-slim-bookworm
 
 WORKDIR /app
@@ -57,7 +40,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
   apt-get install -y nodejs && \
   rm -rf /var/lib/apt/lists/*
 
-# Install Remotion dependencies globally
+# Install Remotion and @remotion/renderer globally
 RUN npm install -g remotion @remotion/renderer
 
 # Copy Python requirements and install
@@ -67,8 +50,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy Python application
 COPY app ./app
 
-# Copy built Node.js wrapper
-COPY --from=node-builder /build/dist ./node/dist
+# Copy Node.js wrapper dependencies and script
+COPY --from=node-builder /build/node_modules ./node/node_modules
+COPY --from=node-builder /build/package.json ./node/
+COPY --from=node-builder /build/renderer.ts ./node/
 
 # Create output directory
 RUN mkdir -p /app/outputs
@@ -77,6 +62,7 @@ RUN mkdir -p /app/outputs
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV OUTPUT_DIR=/app/outputs
+ENV NODE_PATH=/usr/local/lib/node_modules
 
 # Expose port
 EXPOSE 8000

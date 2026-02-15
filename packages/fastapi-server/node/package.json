@@ -3,15 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "scripts": {
-    "build": "tsc"
-  },
   "dependencies": {
-    "@remotion/renderer": "workspace:*",
-    "remotion": "workspace:*"
-  },
-  "devDependencies": {
-    "@types/node": "catalog:",
-    "typescript": "catalog:"
+    "@types/node": "^20.12.14",
+    "typescript": "^5.9.3",
+    "tsx": "^4.19.0"
   }
 }

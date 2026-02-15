@@ -2,6 +2,7 @@
 import json
 import subprocess
 import asyncio
+import os
 from typing import Optional, Dict, Any, Callable, Awaitable
 from pathlib import Path
 from ..config import settings
@@ -11,9 +12,12 @@ class NodeRenderer:
     """Wrapper for Node.js renderer process"""
 
     def __init__(self):
-        self.node_path = Path(__file__).parent.parent / "node" / "dist" / "renderer.js"
+        # Go up from services/ to app/, then to node/
+        base_path = Path(__file__).parent.parent.parent
+        self.node_path = base_path / "node" / "renderer.ts"
+        self.node_modules_path = base_path / "node" / "node_modules"
         if not self.node_path.exists():
-            raise RuntimeError(f"Node renderer not found at {self.node_path}. Run 'cd node && bun install && bun run build'")
+            raise RuntimeError(f"Node renderer not found at {self.node_path}")
 
     async def render_media(
         self,
@@ -57,13 +61,16 @@ class NodeRenderer:
         on_progress: Optional[Callable[[Dict[str, Any]], Awaitable[None]]] = None
     ) -> Dict[str, Any]:
         """Execute Node.js process and handle output"""
+        # Use tsx to run TypeScript directly
+        tsx_path = self.node_modules_path / ".bin" / "tsx"
         process = await asyncio.create_subprocess_exec(
-            settings.NODE_PATH,
+            str(tsx_path),
             str(self.node_path),
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd=str(self.node_path.parent)
+            cwd=str(self.node_path.parent),
+            env={**{"NODE_PATH": "/usr/local/lib/node_modules"}, **{"PATH": os.environ.get("PATH", "")}}
         )
 
         # Write input to stdin
