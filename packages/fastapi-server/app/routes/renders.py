@@ -8,6 +8,25 @@ from ..services.queue import queue as render_queue
 router = APIRouter()
 
 
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake_case to camelCase"""
+    components = snake_str.split('_')
+    return components[0] + ''.join(x.title() for x in components[1:])
+
+
+def convert_dict_to_camel_case(data: dict) -> dict:
+    """Convert all keys in a dictionary from snake_case to camelCase"""
+    result = {}
+    for key, value in data.items():
+        camel_key = to_camel_case(key)
+        # Handle nested objects like chromium_options and input_props
+        if isinstance(value, dict):
+            result[camel_key] = convert_dict_to_camel_case(value)
+        else:
+            result[camel_key] = value
+    return result
+
+
 @router.post("/render/media", response_model=RenderMediaResponse)
 async def render_media(request: RenderMediaRequest):
     """Submit a video render job"""
@@ -21,6 +40,9 @@ async def render_media(request: RenderMediaRequest):
         # Convert image_format enum to value
         if "image_format" in options and hasattr(options["image_format"], "value"):
             options["image_format"] = options["image_format"].value
+
+        # Convert snake_case to camelCase for Node.js wrapper
+        options = convert_dict_to_camel_case(options)
 
         job_id = await render_queue.enqueue("media", options)
 
@@ -45,6 +67,9 @@ async def render_still(request: RenderStillRequest):
         # Convert image_format enum to value
         if "image_format" in options and hasattr(options["image_format"], "value"):
             options["image_format"] = options["image_format"].value
+
+        # Convert snake_case to camelCase for Node.js wrapper
+        options = convert_dict_to_camel_case(options)
 
         job_id = await render_queue.enqueue("still", options)
 
