@@ -1,6 +1,6 @@
 """Render-related endpoints"""
 import os
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from typing import Optional
 from ..models.render import RenderMediaRequest, RenderMediaResponse, RenderStillRequest, RenderStillResponse
 from ..models.common import JobStatusResponse, ListJobsResponse, JobStatus, CancelJobResponse
@@ -48,10 +48,16 @@ def transform_serve_url(serve_url: str) -> str:
 
 
 @router.post("/render/media", response_model=RenderMediaResponse)
-async def render_media(request: RenderMediaRequest):
+async def render_media(req_request: Request, request: RenderMediaRequest):
     """Submit a video render job"""
     try:
+        # Debug: log raw request body
+        import json
+        body = await req_request.body()
+        print(f"DEBUG: Raw request body: {body.decode()}", flush=True)
+
         options = request.model_dump(exclude_none=True)
+        print(f"DEBUG: After model_dump: {options}", flush=True)
 
         # Transform localhost URLs to internal Docker service URLs
         if "serve_url" in options:
