@@ -88,14 +88,17 @@ class NodeRenderer:
         final_result = {}
         line_count = 0
         last_progress_time = asyncio.get_event_loop().time()
-        timeout_seconds = 1200  # 20 minutes timeout (for encoding with large videos)
+        timeout_seconds = 1800  # 30 minutes timeout (for encoding with large videos)
+        per_line_timeout = 120.0  # 120 seconds timeout per line (FFmpeg can be slow)
+
+        print(f"DEBUG: Started reading process output (timeout: {timeout_seconds}s total, {per_line_timeout}s per line)", flush=True)
 
         while True:
             try:
                 # Wait for output with timeout
                 line = await asyncio.wait_for(
                     process.stdout.readline(),
-                    timeout=30.0  # 30 seconds timeout per line
+                    timeout=per_line_timeout
                 )
             except asyncio.TimeoutError:
                 # Check if process is still running
@@ -104,12 +107,14 @@ class NodeRenderer:
 
                 # Check if we've exceeded total timeout
                 current_time = asyncio.get_event_loop().time()
-                if current_time - last_progress_time > timeout_seconds:
+                time_since_progress = current_time - last_progress_time
+                if time_since_progress > timeout_seconds:
                     print(f"DEBUG: Process timeout after {timeout_seconds}s with no progress", flush=True)
                     process.kill()
                     raise RuntimeError(f"Process timeout after {timeout_seconds} seconds")
 
-                # Continue waiting
+                # Log timeout but continue waiting (FFmpeg encoding is slow)
+                print(f"DEBUG: No output for {int(time_since_progress)}s, continuing to wait... (timeout at {timeout_seconds}s)", flush=True)
                 continue
 
             if not line:
@@ -124,9 +129,16 @@ class NodeRenderer:
 
                 if data.get('type') == 'progress':
                     last_progress_time = asyncio.get_event_loop().time()  # Update last activity
-                    print(f"DEBUG: Received progress: {data.get('data')}", flush=True)
+                    progress_data = data.get('data')
+                    progress_pct = progress_data.get('progress', 0) * 100
+                    stage = progress_data.get('stitchStage', 'unknown')
+                    encoded = progress_data.get('encodedFrames', 0)
+                    rendered = progress_data.get('renderedFrames', 0)
+
+                    print(f"DEBUG: Progress: {progress_pct:.1f}% | Stage: {stage} | Encoded: {encoded}/{rendered}", flush=True)
+
                     if on_progress:
-                        await on_progress(data.get('data'))
+                        await on_progress(progress_data)
                 elif data.get('type') == 'complete':
                     print(f"DEBUG: Received complete signal", flush=True)
                     final_result = {'status': 'success'}
