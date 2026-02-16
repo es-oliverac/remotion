@@ -1,9 +1,9 @@
-# Multi-stage build for Remotion frontend bundle
+# Simple Remotion bundle server
 FROM node:22-bookworm-slim AS builder
 
-WORKDIR /monorepo
+WORKDIR /app
 
-# Install system dependencies for building
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
   libnss3 \
   libdbus-1-3 \
@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
-# Copy monorepo files
+# Copy entire monorepo
 COPY package.json bun.lock ./
 COPY packages packages
 COPY turbo.json ./
@@ -37,23 +37,23 @@ COPY turbo.json ./
 # Install dependencies
 RUN bun install
 
-# Build all packages using turbo
+# Build packages
 RUN bunx turbo run make --filter="@remotion/example"
 
-# Create a production bundle
-WORKDIR /monorepo/packages/example
-RUN bunx remotion bundle src/index.ts --public=/public/
+# Build the bundle
+WORKDIR /app/packages/example
+RUN bunx remotion bundle src/index.ts
 
-# Production stage: serve the bundle with Python HTTP server
+# Production: serve bundle
 FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-# Install a simple HTTP server
+# Install http-server
 RUN npm install -g http-server
 
-# Copy the bundle from builder
-COPY --from=builder /monorepo/packages/example/public /app
+# Copy bundle
+COPY --from=builder /app/packages/example/public /app
 
 # Expose port
 EXPOSE 3000
@@ -62,5 +62,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Serve the bundle
+# Serve
 CMD ["http-server", ".", "-p", "3000"]
