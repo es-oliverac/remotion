@@ -28,18 +28,17 @@ def convert_dict_to_camel_case(data: dict) -> dict:
 
 
 def transform_serve_url(serve_url: str) -> str:
-    """Transform localhost URLs to internal Docker service URLs"""
-    # Get the internal frontend URL from environment
-    internal_frontend_url = os.getenv("REMOTION_FRONTEND_URL", "http://frontend:3000")
+    """Transform ALL URLs to internal Docker service URLs for renderer access.
 
-    # If the URL contains localhost, replace it with the internal service URL
-    # This handles cases like http://localhost:3333 or http://127.0.0.1:3333
-    if "localhost" in serve_url or "127.0.0.1" in serve_url:
-        # Extract the path from the original URL if any
-        # and use the internal service URL
-        return internal_frontend_url
+    The renderer runs inside the Docker network and must use internal container
+    URLs to access the frontend, even if the client passed a public URL.
+    """
+    # Always use the internal frontend URL for renderer access
+    # This is required because the renderer runs inside Docker
+    internal_frontend_url = os.getenv("REMOTION_FRONTEND_URL", "http://remotion-frontend:3000")
 
-    return serve_url
+    print(f"DEBUG: Transforming {serve_url} to internal URL {internal_frontend_url}", flush=True)
+    return internal_frontend_url
 
 
 @router.post("/compositions", response_model=GetCompositionsResponse)
