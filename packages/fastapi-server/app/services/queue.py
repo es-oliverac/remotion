@@ -144,8 +144,21 @@ class RenderQueue:
                 else:
                     extension = 'mp4'
 
-                output_path = job.options.get('output_path') or \
-                    storage.get_output_path(job.id, extension)
+                output_path = job.options.get('output_path')
+
+                if output_path:
+                    # Verify or correct the file extension
+                    from pathlib import Path
+                    path_obj = Path(output_path)
+                    current_ext = path_obj.suffix.lstrip('.')
+
+                    if current_ext != extension:
+                        # Wrong extension, replace it
+                        output_path = str(path_obj.with_suffix(f'.{extension}'))
+                        print(f"DEBUG: Corrected output extension from .{current_ext} to .{extension}", flush=True)
+                else:
+                    # No output path specified, generate one
+                    output_path = storage.get_output_path(job.id, extension)
 
                 job.options['output_path'] = output_path
                 print(f"DEBUG: Rendering media to {output_path} (codec: {codec})", flush=True)
