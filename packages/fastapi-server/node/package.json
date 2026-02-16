@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@remotion/renderer": "4.0.422",
     "@types/node": "^20.12.14",
     "typescript": "^5.9.3",
     "tsx": "^4.19.0"
