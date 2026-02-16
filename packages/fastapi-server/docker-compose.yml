@@ -30,11 +30,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
-          memory: 10G
+          cpus: '6'
+          memory: 16G
         reservations:
-          cpus: '1'
-          memory: 2G
+          cpus: '2'
+          memory: 4G
 
 volumes:
   remotion-outputs:
