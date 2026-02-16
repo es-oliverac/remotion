@@ -118,8 +118,8 @@ async function main() {
           // Use multiple threads for faster encoding
           '-threads',
           '8',
-          // Faster encoding for H.264
-          ...(opts.codec === 'h264' || opts.codec === 'h265' ? ['-preset', 'faster'] : []),
+          // Ultra-fast encoding for H.264/H.265
+          ...(opts.codec === 'h264' || opts.codec === 'h265' ? ['-preset', 'ultrafast'] : []),
           // User-specified flags take precedence
           ...(opts.ffmpegCraneflag || [])
         ],

@@ -138,7 +138,7 @@ class RenderQueue:
         try:
             if job.type == "media":
                 # Determine extension based on codec
-                codec = job.options.get('codec', 'prores')
+                codec = job.options.get('codec', 'h264')  # Changed default to h264
                 if codec == 'prores':
                     extension = 'mov'
                 else:
