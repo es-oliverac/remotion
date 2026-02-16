@@ -75,14 +75,20 @@ async function main() {
     const inputStr = readFileSync(0, 'utf-8').trim();
     const input: CliInput = JSON.parse(inputStr);
 
+    writeOutput({ type: 'info', message: `Received command: ${input.command}` });
+
     if (input.command === 'renderMedia') {
       const opts = input.options as RenderMediaInput;
+
+      writeOutput({ type: 'info', message: `Starting render for composition ${opts.composition}` });
 
       const composition = await selectComposition({
         serveUrl: opts.serveUrl,
         id: opts.composition,
         inputProps: opts.inputProps,
       });
+
+      writeOutput({ type: 'info', message: `Selected composition: ${composition.id}` });
 
       await renderMedia({
         serveUrl: opts.serveUrl,
@@ -131,8 +137,7 @@ async function main() {
     } else if (input.command === 'getCompositions') {
       const opts = input.options as GetCompositionsInput;
 
-      const comps = await getCompositions({
-        serveUrl: opts.serveUrl,
+      const comps = await getCompositions(opts.serveUrl, {
         inputProps: opts.inputProps,
         envVariables: opts.envVariables,
       });
@@ -153,7 +158,9 @@ async function main() {
       process.exit(1);
     }
   } catch (error) {
-    writeError(error instanceof Error ? error.message : String(error));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : '';
+    writeError(`${errorMessage}\nStack: ${stack}`);
     process.exit(1);
   }
 }

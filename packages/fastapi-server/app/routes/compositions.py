@@ -1,4 +1,5 @@
 """Composition-related endpoints"""
+import os
 from fastapi import APIRouter, HTTPException, status
 from ..models.composition import GetCompositionsRequest, GetCompositionsResponse
 from ..services.renderer import NodeRenderer
@@ -26,11 +27,32 @@ def convert_dict_to_camel_case(data: dict) -> dict:
     return result
 
 
+def transform_serve_url(serve_url: str) -> str:
+    """Transform localhost URLs to internal Docker service URLs"""
+    # Get the internal frontend URL from environment
+    internal_frontend_url = os.getenv("REMOTION_FRONTEND_URL", "http://frontend:3000")
+
+    # If the URL contains localhost, replace it with the internal service URL
+    # This handles cases like http://localhost:3333 or http://127.0.0.1:3333
+    if "localhost" in serve_url or "127.0.0.1" in serve_url:
+        # Extract the path from the original URL if any
+        # and use the internal service URL
+        return internal_frontend_url
+
+    return serve_url
+
+
 @router.post("/compositions", response_model=GetCompositionsResponse)
 async def get_compositions(request: GetCompositionsRequest):
     """Get available compositions from a Remotion bundle"""
     try:
         options = request.model_dump(exclude_none=True)
+
+        # Transform localhost URLs to internal Docker service URLs
+        if "serve_url" in options:
+            original_url = options["serve_url"]
+            options["serve_url"] = transform_serve_url(original_url)
+            print(f"DEBUG: Transformed URL from {original_url} to {options['serve_url']}", flush=True)
 
         # Ensure inputProps is an object, not None
         if "input_props" in options:

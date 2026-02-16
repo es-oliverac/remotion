@@ -10,7 +10,7 @@ class Composition(BaseModel):
     height: int
     fps: int
     duration_in_frames: int
-    default_output: Optional[str] = None
+    default_output: Optional[Dict[str, Any]] = None
 
 
 class GetCompositionsRequest(BaseModel):

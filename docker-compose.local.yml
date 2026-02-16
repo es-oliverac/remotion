@@ -1,0 +1,37 @@
+services:
+  fastapi:
+    image: remotion-fastapi-local
+    container_name: remotion-fastapi-local
+    ports:
+      - "8888:8000"
+    volumes:
+      - fastapi-outputs:/app/outputs
+    environment:
+      - APP_NAME=Remotion FastAPI Server (Local)
+      - DEBUG=false
+      - MAX_CONCURRENT_RENDERS=2
+      - OUTPUT_DIR=/app/outputs
+      - BASE_URL=http://localhost:8888
+      - MAX_BROWSER_INSTANCES=3
+      - REMOTION_FRONTEND_URL=http://frontend:3000
+    depends_on:
+      - frontend
+    networks:
+      - remotion-network
+
+  frontend:
+    build:
+      context: ./test-minimal
+      dockerfile: Dockerfile
+    container_name: remotion-frontend-local
+    ports:
+      - "3333:3000"
+    networks:
+      - remotion-network
+
+networks:
+  remotion-network:
+    driver: bridge
+
+volumes:
+  fastapi-outputs:

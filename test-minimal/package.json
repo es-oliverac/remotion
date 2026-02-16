@@ -1,0 +1,14 @@
+{
+  "name": "test-minimal",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "remotion studio",
+    "build": "remotion bundle",
+    "comps": "remotion compositions"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.422",
+    "remotion": "^4.0.422"
+  }
+}

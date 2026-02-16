@@ -63,6 +63,10 @@ class NodeRenderer:
         """Execute Node.js process and handle output"""
         # Use tsx to run TypeScript directly
         tsx_path = self.node_modules_path / ".bin" / "tsx"
+
+        # Debug logging
+        print(f"DEBUG: Executing Node.js with input: {json.dumps(input_data, indent=2)}", flush=True)
+
         process = await asyncio.create_subprocess_exec(
             str(tsx_path),
             str(self.node_path),
