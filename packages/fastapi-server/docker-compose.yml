@@ -37,12 +37,7 @@ services:
         reservations:
           cpus: '1'
           memory: 1G
-    networks:
-      - remotion-network
-
-networks:
-  remotion-network:
-    driver: bridge
+    network_mode: bridge
 
 volumes:
   remotion-outputs:
