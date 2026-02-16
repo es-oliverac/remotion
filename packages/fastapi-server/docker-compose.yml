@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   remotion-api:
     build:
@@ -37,7 +35,6 @@ services:
         reservations:
           cpus: '1'
           memory: 1G
-    network_mode: bridge
 
 volumes:
   remotion-outputs:
