@@ -1,4 +1,4 @@
-# Multi-stage build for Remotion frontend server
+# Multi-stage build for Remotion frontend bundle
 FROM node:22-bookworm-slim AS builder
 
 WORKDIR /monorepo
@@ -40,48 +40,27 @@ RUN bun install
 # Build all packages using turbo
 RUN bunx turbo run make --filter="@remotion/example"
 
-# Production stage: run Remotion studio
+# Create a production bundle
+WORKDIR /monorepo/packages/example
+RUN bunx remotion bundle src/index.ts --public=/public/
+
+# Production stage: serve the bundle with Python HTTP server
 FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-# Install system dependencies for Chrome
-RUN apt-get update && apt-get install -y \
-  libnss3 \
-  libdbus-1-3 \
-  libatk1.0-0 \
-  libgbm-dev \
-  libasound2 \
-  libxrandr2 \
-  libxkbcommon-dev \
-  libxfixes3 \
-  libxcomposite1 \
-  libxdamage1 \
-  libatk-bridge2.0-0 \
-  libpango-1.0-0 \
-  libcairo2 \
-  libcups2 \
-  curl \
-  unzip \
-  && rm -rf /var/lib/apt/lists/*
+# Install a simple HTTP server
+RUN npm install -g http-server
 
-# Install Bun
-RUN curl -fsSL https://bun.sh/install | bash
-ENV PATH="/root/.bun/bin:${PATH}"
-
-# Copy the built monorepo
-COPY --from=builder /monorepo /monorepo
-WORKDIR /monorepo/packages/example
-
-# Install Chrome
-RUN bunx remotion browser ensure
+# Copy the bundle from builder
+COPY --from=builder /monorepo/packages/example/public /app
 
 # Expose port
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Run Remotion studio (includes preview server)
-CMD ["bun", "remotion", "studio", "--port", "3000", "--host", "0.0.0.0"]
+# Serve the bundle
+CMD ["http-server", ".", "-p", "3000"]
