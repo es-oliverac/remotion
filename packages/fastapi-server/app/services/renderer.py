@@ -74,8 +74,10 @@ class NodeRenderer:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             cwd=str(self.node_path.parent),
-            env={**{"NODE_PATH": "/usr/local/lib/node_modules"}, **{"PATH": os.environ.get("PATH", "")}}
+            env={**{"NODE_PATH": os.environ.get("NODE_PATH", "/usr/local/lib/node_modules")}, **os.environ}
         )
+
+        print(f"DEBUG: Process started with PID: {process.pid}", flush=True)
 
         # Write input to stdin
         stdin_json = json.dumps(input_data) + "\n"
@@ -84,33 +86,48 @@ class NodeRenderer:
 
         # Read output line by line
         final_result = {}
+        line_count = 0
 
         while True:
             line = await process.stdout.readline()
             if not line:
+                print(f"DEBUG: EOF reached after {line_count} lines", flush=True)
                 break
 
+            line_count += 1
+            line_str = line.decode('utf-8').strip()
+
             try:
-                data = json.loads(line.decode('utf-8').strip())
+                data = json.loads(line_str)
 
                 if data.get('type') == 'progress':
+                    print(f"DEBUG: Received progress: {data.get('data')}", flush=True)
                     if on_progress:
                         await on_progress(data.get('data'))
                 elif data.get('type') == 'complete':
+                    print(f"DEBUG: Received complete signal", flush=True)
                     final_result = {'status': 'success'}
                 elif data.get('type') == 'compositions':
+                    print(f"DEBUG: Received compositions", flush=True)
                     final_result = data
                 elif data.get('type') == 'error':
+                    print(f"DEBUG: Received error: {data.get('message')}", flush=True)
                     raise RuntimeError(data.get('message'))
+                elif data.get('type') == 'info':
+                    print(f"DEBUG: [info] {data.get('message')}", flush=True)
 
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"DEBUG: Failed to parse JSON: {line_str[:100]}", flush=True)
                 continue
 
         await process.wait()
 
+        print(f"DEBUG: Process finished with return code: {process.returncode}", flush=True)
+
         if process.returncode != 0:
             stderr_output = await process.stderr.read()
             error_msg = stderr_output.decode('utf-8')
+            print(f"DEBUG: Process stderr: {error_msg}", flush=True)
             raise RuntimeError(f"Node.js process failed: {error_msg}")
 
         return final_result
