@@ -14,10 +14,8 @@ const HelloWorld = () => {
   const frame = (0,esm.useCurrentFrame)();
   const opacity = (0,esm.interpolate)(
     frame,
-    30,
-    90,
-    0,
-    1,
+    [30, 90],
+    [0, 1],
     {
       extrapolateRight: false
     }

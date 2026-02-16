@@ -22,7 +22,25 @@
       "Bash(done)",
       "Bash(git init:*)",
       "Bash(git config:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(git remote add:*)",
+      "Bash(docker build:*)",
+      "Bash(docker:*)",
+      "Bash(curl:*)",
+      "Bash(bunx remotion bundle:*)",
+      "Bash(npx create-video@latest:*)",
+      "Bash(npm install:*)",
+      "Bash(npx remotion bundle:*)",
+      "Bash(docker-compose:*)",
+      "Bash(npm run bundle:*)",
+      "Bash(npm run)",
+      "Bash(ls:*)",
+      "Bash(npm run build:*)",
+      "Bash(pkill:*)"
     ]
   }
 }
