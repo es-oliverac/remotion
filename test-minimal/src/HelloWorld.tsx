@@ -23,18 +23,22 @@ export const HelloWorld: React.FC = () => {
     <AbsoluteFill
       style={{
         backgroundColor: '#000000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 100,
-        fontWeight: 'bold',
-        color: '#ffffff',
       }}
     >
       <div
         style={{
-          opacity,
-          transform: `scale(${scale})`,
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: `translate(-50%, -50%) scale(${scale})`,
+          fontSize: 120,
+          fontWeight: 900,
+          color: '#ffffff',
           textAlign: 'center',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          opacity,
+          textShadow: '4px 4px 8px rgba(0,0,0,0.8)',
+          WebkitTextStroke: '1px rgba(255,255,255,0.3)',
         }}
       >
         HOLA DESDE REMOTION!

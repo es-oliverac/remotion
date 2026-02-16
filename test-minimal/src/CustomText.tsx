@@ -24,28 +24,25 @@ export const CustomText: React.FC<CustomTextProps> = ({
   return (
     <AbsoluteFill
       style={{
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#667eea',
-        fontFamily: 'Arial, sans-serif',
       }}
     >
       {/* Title */}
       <div
         style={{
+          position: 'absolute',
+          top: '30%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           fontSize: 100,
-          fontWeight: 'bold',
+          fontWeight: 900,
           color: '#ffffff',
+          fontFamily: 'Arial, Helvetica, sans-serif',
           textAlign: 'center',
           opacity: interpolate(frame, [0, 30], [0, 1], {
             extrapolateRight: 'clamp',
           }),
-          transform: `scale(${spring({
-            frame,
-            fps: 30,
-            config: { damping: 10 },
-          })})`,
-          marginBottom: 80,
+          textShadow: '4px 4px 8px rgba(0,0,0,0.5)',
         }}
       >
         {title}
@@ -54,6 +51,10 @@ export const CustomText: React.FC<CustomTextProps> = ({
       {/* Animated Words */}
       <div
         style={{
+          position: 'absolute',
+          top: '55%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
@@ -81,10 +82,12 @@ export const CustomText: React.FC<CustomTextProps> = ({
               key={index}
               style={{
                 fontSize: 60,
-                fontWeight: 'bold',
+                fontWeight: 900,
                 color,
                 opacity,
                 transform: `scale(${scale})`,
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               }}
             >
               {word}
@@ -98,13 +101,17 @@ export const CustomText: React.FC<CustomTextProps> = ({
         style={{
           position: 'absolute',
           bottom: 80,
+          left: '50%',
+          transform: 'translateX(-50%)',
           fontSize: 40,
           color: '#ffffff',
-          fontWeight: 'bold',
+          fontWeight: 700,
+          fontFamily: 'Arial, Helvetica, sans-serif',
           textAlign: 'center',
           opacity: interpolate(frame, [180, 220], [0, 1], {
             extrapolateRight: 'clamp',
           }),
+          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
         }}
       >
         {subtitle}

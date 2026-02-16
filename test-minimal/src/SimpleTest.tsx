@@ -5,16 +5,21 @@ export const SimpleTest: React.FC = () => {
     <AbsoluteFill
       style={{
         backgroundColor: 'red',
-        justifyContent: 'center',
-        alignItems: 'center',
       }}
     >
       <div
         style={{
-          fontSize: 100,
-          fontWeight: 'bold',
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          fontSize: 120,
+          fontWeight: 900,
           color: 'white',
           textAlign: 'center',
+          fontFamily: 'Arial, Helvetica, sans-serif',
+          textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+          WebkitTextStroke: '2px black',
         }}
       >
         SI VEO ESTO, FUNCIONA

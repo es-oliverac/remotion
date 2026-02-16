@@ -29,16 +29,16 @@ export const AnimatedText: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: '#1a1a2e',
-        fontSize: 80,
-        fontWeight: 'bold',
-        fontFamily: 'Arial, sans-serif',
       }}
     >
+      {/* Main words container */}
       <div
         style={{
+          position: 'absolute',
+          top: '40%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
           display: 'flex',
           flexWrap: 'wrap',
           justifyContent: 'center',
@@ -48,15 +48,12 @@ export const AnimatedText: React.FC = () => {
         }}
       >
         {words.map((word, index) => {
-          // Each word appears at a different time
-          const startFrame = index * 25; // Start every 25 frames
+          const startFrame = index * 25;
 
-          // Opacity animation (fade in)
           const opacity = interpolate(frame, [startFrame, startFrame + 20], [0, 1], {
             extrapolateRight: 'clamp',
           });
 
-          // Scale animation (spring effect)
           const scale = spring({
             frame: frame - startFrame,
             fps: 30,
@@ -70,9 +67,13 @@ export const AnimatedText: React.FC = () => {
             <div
               key={index}
               style={{
+                fontSize: 80,
+                fontWeight: 900,
                 color: colors[index % colors.length],
                 opacity,
                 transform: `scale(${scale})`,
+                fontFamily: 'Arial, Helvetica, sans-serif',
+                textShadow: `3px 3px 6px rgba(0,0,0,0.8)`,
               }}
             >
               {word}
@@ -86,11 +87,16 @@ export const AnimatedText: React.FC = () => {
         style={{
           position: 'absolute',
           bottom: 100,
+          left: '50%',
+          transform: 'translateX(-50%)',
           fontSize: 40,
+          fontWeight: 700,
           color: '#ffffff',
+          fontFamily: 'Arial, Helvetica, sans-serif',
           opacity: interpolate(frame, [200, 240], [0, 1], {
             extrapolateRight: 'clamp',
           }),
+          textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
         }}
       >
         Video Renderizado en Easypanel 🚀
