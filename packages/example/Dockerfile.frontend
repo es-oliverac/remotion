@@ -32,12 +32,16 @@ ENV PATH="/root/.bun/bin:${PATH}"
 # Copy monorepo files
 COPY package.json bun.lock ./
 COPY packages packages
+COPY turbo.json ./
 
-# Build the packages
-WORKDIR /monorepo/packages/example
+# Install dependencies
 RUN bun install
 
+# Build all packages using turbo
+RUN bunx turbo run make --filter="@remotion/example"
+
 # Create the bundle
+WORKDIR /monorepo/packages/example
 RUN bun run bundle
 
 # Production stage: serve static files
