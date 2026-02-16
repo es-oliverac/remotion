@@ -29,6 +29,11 @@ interface RenderMediaInput {
   overwrite: boolean;
   audioBitrate?: number;
   videoBitrate?: number;
+  // Faster encoding options
+  fps?: number;  // Reduce FPS for faster rendering
+  enforceAudioTrack?: boolean;
+  // FFmpeg optimization flags
+  ffmpegCraneflag?: string[];
 }
 
 interface RenderStillInput {
@@ -106,6 +111,9 @@ async function main() {
         overwrite: opts.overwrite,
         audioBitrate: opts.audioBitrate,
         videoBitrate: opts.videoBitrate,
+        fps: opts.fps,
+        enforceAudioTrack: opts.enforceAudioTrack,
+        ffmpegCraneflag: opts.ffmpegCraneflag,
         onProgress: (progress: ProgressData) => {
           writeOutput({ type: 'progress', data: progress });
         },

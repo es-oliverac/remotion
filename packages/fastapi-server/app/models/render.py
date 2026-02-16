@@ -48,6 +48,10 @@ class RenderMediaRequest(BaseModel):
     overwrite: bool = Field(default=False, description="Overwrite existing output")
     audio_bitrate: Optional[int] = Field(default=None, description="Audio bitrate")
     video_bitrate: Optional[int] = Field(default=None, description="Video bitrate")
+    # Fast encoding options
+    fps: Optional[int] = Field(default=None, ge=1, le=144, description="Output FPS (lower = faster)")
+    enforce_audio_track: Optional[bool] = Field(default=None, description="Enforce audio track in output")
+    ffmpeg_craneflag: Optional[list[str]] = Field(default=None, description="FFmpeg crane flags for optimization")
 
 
 class RenderMediaResponse(BaseModel):
