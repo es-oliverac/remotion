@@ -13,7 +13,7 @@ services:
       - DEBUG=false
       - MAX_CONCURRENT_RENDERS=2
       - OUTPUT_DIR=/app/outputs
-      - BASE_URL=http://localhost:8000
+      - BASE_URL=https://n8n-remotion.alzadl.easypanel.host
       - MAX_BROWSER_INSTANCES=3
       - MAX_BROWSER_IDLE_SECONDS=300
       - JOB_CLEANUP_HOURS=24
