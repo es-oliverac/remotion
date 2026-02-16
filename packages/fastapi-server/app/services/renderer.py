@@ -84,12 +84,34 @@ class NodeRenderer:
         process.stdin.write(stdin_json.encode('utf-8'))
         process.stdin.close()
 
-        # Read output line by line
+        # Read output line by line with timeout
         final_result = {}
         line_count = 0
+        last_progress_time = asyncio.get_event_loop().time()
+        timeout_seconds = 600  # 10 minutes timeout
 
         while True:
-            line = await process.stdout.readline()
+            try:
+                # Wait for output with timeout
+                line = await asyncio.wait_for(
+                    process.stdout.readline(),
+                    timeout=30.0  # 30 seconds timeout per line
+                )
+            except asyncio.TimeoutError:
+                # Check if process is still running
+                if process.returncode is not None:
+                    break
+
+                # Check if we've exceeded total timeout
+                current_time = asyncio.get_event_loop().time()
+                if current_time - last_progress_time > timeout_seconds:
+                    print(f"DEBUG: Process timeout after {timeout_seconds}s with no progress", flush=True)
+                    process.kill()
+                    raise RuntimeError(f"Process timeout after {timeout_seconds} seconds")
+
+                # Continue waiting
+                continue
+
             if not line:
                 print(f"DEBUG: EOF reached after {line_count} lines", flush=True)
                 break
@@ -101,6 +123,7 @@ class NodeRenderer:
                 data = json.loads(line_str)
 
                 if data.get('type') == 'progress':
+                    last_progress_time = asyncio.get_event_loop().time()  # Update last activity
                     print(f"DEBUG: Received progress: {data.get('data')}", flush=True)
                     if on_progress:
                         await on_progress(data.get('data'))
@@ -114,9 +137,10 @@ class NodeRenderer:
                     print(f"DEBUG: Received error: {data.get('message')}", flush=True)
                     raise RuntimeError(data.get('message'))
                 elif data.get('type') == 'info':
+                    last_progress_time = asyncio.get_event_loop().time()  # Update last activity
                     print(f"DEBUG: [info] {data.get('message')}", flush=True)
 
-            except json.JSONDecodeError as e:
+            except json.JSONDecodeError:
                 print(f"DEBUG: Failed to parse JSON: {line_str[:100]}", flush=True)
                 continue
 
