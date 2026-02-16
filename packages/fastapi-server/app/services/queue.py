@@ -65,12 +65,15 @@ class RenderQueue:
     async def start(self):
         """Start queue workers"""
         if self._running:
+            print("DEBUG: Queue workers already running", flush=True)
             return
 
         self._running = True
+        print(f"DEBUG: Starting {self.max_concurrent} queue workers", flush=True)
         for i in range(self.max_concurrent):
             worker = asyncio.create_task(self._worker(f"worker-{i}"))
             self._workers.append(worker)
+        print(f"DEBUG: {len(self._workers)} workers started", flush=True)
 
     async def stop(self):
         """Stop queue workers"""
@@ -81,23 +84,33 @@ class RenderQueue:
 
     async def _worker(self, name: str):
         """Worker process that pulls from queue"""
+        print(f"DEBUG: Worker {name} started", flush=True)
         while self._running:
             try:
+                print(f"DEBUG: Worker {name} waiting for job...", flush=True)
                 job_id = await self.queue.get()
+                print(f"DEBUG: Worker {name} got job {job_id}", flush=True)
 
                 job = self.jobs.get(job_id)
                 if not job:
+                    print(f"DEBUG: Worker {name} - job {job_id} not found", flush=True)
                     continue
 
                 if job.cancel_requested:
+                    print(f"DEBUG: Worker {name} - job {job_id} was cancelled", flush=True)
                     job.status = JobStatus.CANCELLED
                     job.completed_at = datetime.utcnow()
                     continue
 
                 # Process the job
+                print(f"DEBUG: Worker {name} processing job {job_id}", flush=True)
                 await self._process_job(job)
+                print(f"DEBUG: Worker {name} finished job {job_id}", flush=True)
 
             except Exception as e:
+                print(f"DEBUG: Worker {name} error: {str(e)}", flush=True)
+                import traceback
+                print(f"DEBUG: Traceback: {traceback.format_exc()}", flush=True)
                 if job_id in self.jobs:
                     job = self.jobs[job_id]
                     job.status = JobStatus.FAILED
@@ -110,6 +123,9 @@ class RenderQueue:
 
     async def _process_job(self, job: Job):
         """Execute a single render job"""
+        print(f"DEBUG: Processing job {job.id} (type: {job.type})", flush=True)
+        print(f"DEBUG: Job options: {job.options}", flush=True)
+
         job.status = JobStatus.IN_PROGRESS
         job.started_at = datetime.utcnow()
         self.active_tasks.add(job.id)
@@ -117,6 +133,7 @@ class RenderQueue:
         # Progress callback
         async def on_progress(data: dict):
             job.progress = data.get('progress', 0.0)
+            print(f"DEBUG: Job {job.id} progress: {job.progress}", flush=True)
 
         try:
             if job.type == "media":
@@ -124,27 +141,35 @@ class RenderQueue:
                     storage.get_output_path(job.id, 'mp4')
 
                 job.options['output_path'] = output_path
+                print(f"DEBUG: Rendering media to {output_path}", flush=True)
 
                 await self.renderer.render_media(job.options, on_progress)
 
                 job.output_path = output_path
                 job.output_url = storage.get_url(output_path)
+                print(f"DEBUG: Media rendered successfully to {output_path}", flush=True)
 
             elif job.type == "still":
                 output_path = job.options.get('output_path') or \
                     storage.get_output_path(job.id, 'png')
 
                 job.options['output_path'] = output_path
+                print(f"DEBUG: Rendering still to {output_path}", flush=True)
 
                 await self.renderer.render_still(job.options, on_progress)
 
                 job.output_path = output_path
                 job.output_url = storage.get_url(output_path)
+                print(f"DEBUG: Still rendered successfully to {output_path}", flush=True)
 
             job.status = JobStatus.COMPLETED
             job.progress = 1.0
+            print(f"DEBUG: Job {job.id} completed successfully", flush=True)
 
         except Exception as e:
+            print(f"DEBUG: Job {job.id} failed: {str(e)}", flush=True)
+            import traceback
+            print(f"DEBUG: Traceback: {traceback.format_exc()}", flush=True)
             job.status = JobStatus.FAILED
             job.error = str(e)
             raise
@@ -163,7 +188,9 @@ class RenderQueue:
         )
 
         self.jobs[job_id] = job
+        print(f"DEBUG: Enqueueing job {job_id} (type: {job_type})", flush=True)
         await self.queue.put(job_id)
+        print(f"DEBUG: Job {job_id} added to queue, queue size: {self.queue.qsize()}", flush=True)
 
         return job_id
 
