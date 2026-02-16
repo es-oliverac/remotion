@@ -21,4 +21,3 @@ services:
 networks:
   remotion-network:
     driver: bridge
-    external: true
