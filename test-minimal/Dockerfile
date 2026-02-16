@@ -35,6 +35,9 @@ COPY src ./src
 COPY remotion.config.* ./
 COPY tsconfig.json ./
 
+# Copy the custom server script
+COPY serve.py /app/serve.py
+
 # Build the Remotion bundle (exposes window.getStaticCompositions)
 RUN npm run build
 
@@ -43,8 +46,8 @@ EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:3000 || exit 1
+  CMD curl -f http://localhost:3000/index.html || exit 1
 
-# Serve the bundle with Python's HTTP server
+# Serve the bundle with custom SPA server
 WORKDIR /app/build
-CMD ["python3", "-m", "http.server", "3000"]
+CMD ["python3", "/app/serve.py"]
