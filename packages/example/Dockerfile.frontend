@@ -1,22 +1,68 @@
-# Use official Remotion example bundle
+# Build Remotion example bundle for production
+FROM node:22-bookworm-slim AS builder
+
+WORKDIR /app
+
+# Install Chrome dependencies
+RUN apt-get update && apt-get install -y \
+  libnss3 \
+  libdbus-1-3 \
+  libatk1.0-0 \
+  libgbm-dev \
+  libasound2 \
+  libxrandr2 \
+  libxkbcommon-dev \
+  libxfixes3 \
+  libxcomposite1 \
+  libxdamage1 \
+  libatk-bridge2.0-0 \
+  libpango-1.0-0 \
+  libcairo2 \
+  libcups2 \
+  curl \
+  && rm -rf /var/lib/apt/lists/*
+
+# Copy package files
+COPY package*.json ./
+COPY packages/example/package*.json ./packages/example/
+
+# Install dependencies
+RUN npm install
+
+# Install Chrome
+RUN npx remotion browser ensure
+
+# Copy example source files
+COPY packages/example/src ./packages/example/src
+COPY packages/example/remotion.config.* ./packages/example/
+COPY packages/example/tsconfig.json ./packages/example/
+COPY packages/example/public ./packages/example/public 2>/dev/null || true
+
+# Build the bundle using the correct script
+WORKDIR /app/packages/example
+RUN npm run bundle
+
+# Production stage
 FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-# Install http-server
-RUN npm install -g http-server
+# Install Python for serving
+RUN apt-get update && apt-get install -y \
+  python3 \
+  python3-pip \
+  && rm -rf /var/lib/apt/lists/*
 
-# Download a pre-built Remotion bundle (example)
-RUN curl -L https://github.com/remotion-dev/remotion/releases/download/v4.0.422/bundle.zip -o bundle.zip && \
-    unzip -o bundle.zip && \
-    rm bundle.zip
+# Copy bundle from builder
+COPY --from=builder /app/packages/example/build ./build
 
 # Expose port
 EXPOSE 3000
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Serve the bundle
-CMD ["http-server", ".", "-p", "3000"]
+# Serve the bundle with Python HTTP server
+WORKDIR /app/build
+CMD ["python3", "-m", "http.server", "3000"]

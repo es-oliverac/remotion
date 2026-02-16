@@ -25,3 +25,10 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
+    networks:
+      - remotion-network
+
+networks:
+  remotion-network:
+    driver: bridge
+    external: true
