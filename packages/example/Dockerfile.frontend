@@ -40,7 +40,7 @@ RUN bun install
 # Build all packages using turbo
 RUN bunx turbo run make --filter="@remotion/example"
 
-# Production stage: run Remotion server
+# Production stage: run Remotion studio
 FROM node:22-bookworm-slim
 
 WORKDIR /app
@@ -83,5 +83,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Run Remotion server
-CMD ["bun", "remotion", "server", "--port", "3000", "--host", "0.0.0.0"]
+# Run Remotion studio (includes preview server)
+CMD ["bun", "remotion", "studio", "--port", "3000", "--host", "0.0.0.0"]
