@@ -28,11 +28,11 @@ RUN curl -fsSL https://bun.sh/install | bash
 ENV BUN_INSTALL_GLOBAL_DIR=/usr/local/bin
 ENV PATH="/root/.bun/bin:${PATH}"
 
-# Copy entire monorepo structure
-# This ensures workspace dependencies can be resolved
+# Copy root package files and workspace configuration
 COPY package*.json ./
-COPY pnpm-workspace.yaml ./
 COPY turbo.json ./
+
+# Note: Bun uses workspaces defined in package.json, not a separate workspace file
 
 # Copy all workspace packages
 COPY packages packages/
