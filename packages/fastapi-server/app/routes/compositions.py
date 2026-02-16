@@ -32,6 +32,10 @@ async def get_compositions(request: GetCompositionsRequest):
     try:
         options = request.model_dump(exclude_none=True)
 
+        # Ensure inputProps is an object, not None
+        if "input_props" in options and options["input_props"] is None:
+            options["input_props"] = {}
+
         # Convert snake_case to camelCase for Node.js wrapper
         options = convert_dict_to_camel_case(options)
 

@@ -33,6 +33,10 @@ async def render_media(request: RenderMediaRequest):
     try:
         options = request.model_dump(exclude_none=True)
 
+        # Ensure inputProps is an object, not None
+        if "input_props" in options and options["input_props"] is None:
+            options["input_props"] = {}
+
         # Convert codec enum to value
         if "codec" in options and hasattr(options["codec"], "value"):
             options["codec"] = options["codec"].value
@@ -63,6 +67,10 @@ async def render_still(request: RenderStillRequest):
     """Submit a still image render job"""
     try:
         options = request.model_dump(exclude_none=True)
+
+        # Ensure inputProps is an object, not None
+        if "input_props" in options and options["input_props"] is None:
+            options["input_props"] = {}
 
         # Convert image_format enum to value
         if "image_format" in options and hasattr(options["image_format"], "value"):
