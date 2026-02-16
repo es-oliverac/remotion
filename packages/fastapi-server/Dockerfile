@@ -17,7 +17,7 @@ FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
-# Install system dependencies for Chrome
+# Install system dependencies for Chrome AND fonts
 RUN apt-get update && apt-get install -y \
   libnss3 \
   libdbus-1-3 \
@@ -33,7 +33,13 @@ RUN apt-get update && apt-get install -y \
   libcups2 \
   curl \
   gnupg \
-  && rm -rf /var/lib/apt/lists/*
+  fonts-liberation \
+  fonts-noto-color-emoji \
+  fonts-dejavu-core \
+  fonts-dejavu \
+  fontconfig \
+  && rm -rf /var/lib/apt/lists/* \
+  && fc-cache -fv
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \

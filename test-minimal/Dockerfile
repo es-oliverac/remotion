@@ -2,7 +2,7 @@ FROM node:22-bookworm-slim
 
 WORKDIR /app
 
-# Install Chrome dependencies and Python for serving
+# Install Chrome dependencies, Python, and fonts for rendering
 RUN apt-get update && apt-get install -y \
   libnss3 \
   libdbus-1-3 \
@@ -21,7 +21,13 @@ RUN apt-get update && apt-get install -y \
   curl \
   python3 \
   python3-pip \
-  && rm -rf /var/lib/apt/lists/*
+  fonts-liberation \
+  fonts-noto-color-emoji \
+  fonts-dejavu-core \
+  fonts-dejavu \
+  fontconfig \
+  && rm -rf /var/lib/apt/lists/* \
+  && fc-cache -fv
 
 # Install project dependencies
 COPY package*.json ./
