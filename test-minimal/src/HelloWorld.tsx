@@ -1,13 +1,13 @@
-import {AbsoluteFill, Sequence, useCurrentFrame, interpolate, spring} from 'remotion';
+import {AbsoluteFill, useCurrentFrame, interpolate, spring} from 'remotion';
 
 export const HelloWorld: React.FC = () => {
   const frame = useCurrentFrame();
   const opacity = interpolate(
     frame,
-    [30, 90],
+    [0, 30],
     [0, 1],
     {
-      extrapolateRight: false,
+      extrapolateRight: 'clamp',
     }
   );
 
@@ -22,15 +22,21 @@ export const HelloWorld: React.FC = () => {
   return (
     <AbsoluteFill
       style={{
+        backgroundColor: '#000000',
         justifyContent: 'center',
         alignItems: 'center',
-        fontSize: 80,
+        fontSize: 100,
         fontWeight: 'bold',
-        background: '#000',
-        color: '#fff',
+        color: '#ffffff',
       }}
     >
-      <div style={{opacity, transform: `scale(${scale})`}}>
+      <div
+        style={{
+          opacity,
+          transform: `scale(${scale})`,
+          textAlign: 'center',
+        }}
+      >
         HOLA DESDE REMOTION!
       </div>
     </AbsoluteFill>

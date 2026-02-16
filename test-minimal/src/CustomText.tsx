@@ -1,4 +1,4 @@
-import {AbsoluteFill, useCurrentFrame, interpolate, spring, Series} from 'remotion';
+import {AbsoluteFill, useCurrentFrame, interpolate, spring} from 'remotion';
 
 interface CustomTextProps {
   title?: string;
@@ -26,16 +26,16 @@ export const CustomText: React.FC<CustomTextProps> = ({
       style={{
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'linear-gradient(to bottom, #667eea 0%, #764ba2 100%)',
+        backgroundColor: '#667eea',
         fontFamily: 'Arial, sans-serif',
       }}
     >
       {/* Title */}
       <div
         style={{
-          fontSize: 120,
+          fontSize: 100,
           fontWeight: 'bold',
-          color: '#fff',
+          color: '#ffffff',
           textAlign: 'center',
           opacity: interpolate(frame, [0, 30], [0, 1], {
             extrapolateRight: 'clamp',
@@ -45,8 +45,7 @@ export const CustomText: React.FC<CustomTextProps> = ({
             fps: 30,
             config: { damping: 10 },
           })})`,
-          textShadow: '0 4px 20px rgba(0,0,0,0.3)',
-          marginBottom: 100,
+          marginBottom: 80,
         }}
       >
         {title}
@@ -77,23 +76,15 @@ export const CustomText: React.FC<CustomTextProps> = ({
             config: { damping: 8, stiffness: 80 },
           });
 
-          const translateY = interpolate(
-            frame,
-            [startFrame, startFrame + 25],
-            [150, 0],
-            { extrapolateRight: 'clamp' }
-          );
-
           return (
             <div
               key={index}
               style={{
-                fontSize: 70,
+                fontSize: 60,
                 fontWeight: 'bold',
                 color,
-                opacity: Math.max(0, Math.min(1, opacity)),
-                transform: `scale(${scale}) translateY(${translateY}px)`,
-                textShadow: `0 2px 10px ${color}`,
+                opacity,
+                transform: `scale(${scale})`,
               }}
             >
               {word}
@@ -107,14 +98,13 @@ export const CustomText: React.FC<CustomTextProps> = ({
         style={{
           position: 'absolute',
           bottom: 80,
-          fontSize: 50,
-          color: '#fff',
+          fontSize: 40,
+          color: '#ffffff',
           fontWeight: 'bold',
           textAlign: 'center',
           opacity: interpolate(frame, [180, 220], [0, 1], {
             extrapolateRight: 'clamp',
           }),
-          textShadow: '0 2px 10px rgba(0,0,0,0.3)',
         }}
       >
         {subtitle}

@@ -2,10 +2,19 @@ import {Composition} from 'remotion';
 import {HelloWorld} from './HelloWorld';
 import {AnimatedText} from './AnimatedText';
 import {CustomText} from './CustomText';
+import {SimpleTest} from './SimpleTest';
 
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="SimpleTest"
+        component={SimpleTest}
+        durationInFrames={90}
+        fps={30}
+        width={1920}
+        height={1080}
+      />
       <Composition
         id="HelloWorld"
         component={HelloWorld}
