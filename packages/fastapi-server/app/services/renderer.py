@@ -88,7 +88,7 @@ class NodeRenderer:
         final_result = {}
         line_count = 0
         last_progress_time = asyncio.get_event_loop().time()
-        timeout_seconds = 900  # 15 minutes timeout (more for encoding with larger files)
+        timeout_seconds = 1200  # 20 minutes timeout (for encoding with large videos)
 
         while True:
             try:
