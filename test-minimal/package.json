@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@remotion/cli": "^4.0.422",
-    "remotion": "^4.0.422"
+    "remotion": "^4.0.422",
+    "@remotion/gif": "^4.0.422"
   }
 }
