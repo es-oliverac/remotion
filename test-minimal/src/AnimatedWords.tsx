@@ -13,12 +13,16 @@ const colors = [
   '#9B59B6', '#3498DB', '#1ABC9C', '#2ECC71', '#E67E22'
 ];
 
-export const AnimatedWords: React.FC<AnimatedWordsProps> = ({
-  words = ['PALABRA', '1', 'PALABRA', '2', 'PALABRA', '3'],
-  title = '',
-  subtitle = '',
-  backgroundColor = '#1a1a2e'
-}) => {
+export const AnimatedWords: React.FC<AnimatedWordsProps> = (props) => {
+  // Debug: log props to console
+  console.log('AnimatedWords props:', JSON.stringify(props));
+
+  const {
+    words = ['PALABRA', '1', 'PALABRA', '2', 'PALABRA', '3'],
+    title = '',
+    subtitle = '',
+    backgroundColor = '#1a1a2e'
+  } = props;
   const frame = useCurrentFrame();
 
   return (

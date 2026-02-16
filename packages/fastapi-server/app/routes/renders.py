@@ -63,6 +63,9 @@ async def render_media(request: RenderMediaRequest):
         if "input_props" in options and options["input_props"] is None:
             options["input_props"] = {}
 
+        # Debug: log inputProps before conversion
+        print(f"DEBUG: input_props before conversion: {options.get('input_props')}", flush=True)
+
         # Convert codec enum to value
         if "codec" in options and hasattr(options["codec"], "value"):
             options["codec"] = options["codec"].value
@@ -73,6 +76,9 @@ async def render_media(request: RenderMediaRequest):
 
         # Convert snake_case to camelCase for Node.js wrapper
         options = convert_dict_to_camel_case(options)
+
+        # Debug: log after conversion
+        print(f"DEBUG: inputProps after conversion: {options.get('inputProps')}", flush=True)
 
         job_id = await render_queue.enqueue("media", options)
 

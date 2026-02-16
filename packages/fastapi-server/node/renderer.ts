@@ -86,6 +86,7 @@ async function main() {
       const opts = input.options as RenderMediaInput;
 
       writeOutput({ type: 'info', message: `Starting render for composition ${opts.composition}` });
+      writeOutput({ type: 'info', message: `Input props: ${JSON.stringify(opts.inputProps)}` });
 
       const composition = await selectComposition({
         serveUrl: opts.serveUrl,
