@@ -7,7 +7,7 @@ services:
       dockerfile: packages/example/Dockerfile.frontend
     container_name: remotion-frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - PORT=3000
     restart: unless-stopped
