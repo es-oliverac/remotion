@@ -35,13 +35,16 @@ COPY src ./src
 COPY remotion.config.* ./
 COPY tsconfig.json ./
 
+# Build the Remotion bundle (exposes window.getStaticCompositions for API)
+RUN npm run build
+
 # Expose port
 EXPOSE 3000
 
-# Health check - verify Remotion studio is running
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# Run Remotion Studio (full editor with timeline)
-# This serves both the visual editor AND exposes window.getStaticCompositions for the API
-CMD ["npm", "start"]
+# Serve the bundle with Python's HTTP server
+WORKDIR /app/build
+CMD ["python3", "-m", "http.server", "3000"]
