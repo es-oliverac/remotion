@@ -30,7 +30,7 @@ RUN curl -fsSL https://bun.sh/install | bash
 ENV PATH="/root/.bun/bin:${PATH}"
 
 # Copy monorepo files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 COPY packages packages
 
 # Build the packages
