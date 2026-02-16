@@ -36,7 +36,7 @@ class RenderMediaRequest(BaseModel):
     composition: str = Field(..., description="Composition ID to render")
     input_props: Optional[Dict[str, Any]] = Field(default={}, description="Props to pass to composition")
     output_path: Optional[str] = Field(default=None, description="Output file path")
-    codec: VideoCodec = Field(default=VideoCodec.H264, description="Video codec")
+    codec: VideoCodec = Field(default=VideoCodec.PRORES, description="Video codec (default: prores for speed)")
     chromium_options: Optional[ChromiumOptions] = Field(default=None, description="Browser options")
     image_format: ValidStillImageFormats = Field(default=ValidStillImageFormats.JPEG, description="Frame format")
     jpeg_quality: int = Field(default=80, ge=1, le=100, description="JPEG quality (1-100)")

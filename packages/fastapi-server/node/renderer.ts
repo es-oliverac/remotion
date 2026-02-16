@@ -113,7 +113,16 @@ async function main() {
         videoBitrate: opts.videoBitrate,
         fps: opts.fps,
         enforceAudioTrack: opts.enforceAudioTrack,
-        ffmpegCraneflag: opts.ffmpegCraneflag,
+        // Add FFmpeg optimization flags automatically
+        ffmpegCraneflag: [
+          // Use multiple threads for faster encoding
+          '-threads',
+          '8',
+          // Faster encoding for H.264
+          ...(opts.codec === 'h264' || opts.codec === 'h265' ? ['-preset', 'faster'] : []),
+          // User-specified flags take precedence
+          ...(opts.ffmpegCraneflag || [])
+        ],
         onProgress: (progress: ProgressData) => {
           writeOutput({ type: 'progress', data: progress });
         },

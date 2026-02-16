@@ -137,11 +137,18 @@ class RenderQueue:
 
         try:
             if job.type == "media":
+                # Determine extension based on codec
+                codec = job.options.get('codec', 'prores')
+                if codec == 'prores':
+                    extension = 'mov'
+                else:
+                    extension = 'mp4'
+
                 output_path = job.options.get('output_path') or \
-                    storage.get_output_path(job.id, 'mp4')
+                    storage.get_output_path(job.id, extension)
 
                 job.options['output_path'] = output_path
-                print(f"DEBUG: Rendering media to {output_path}", flush=True)
+                print(f"DEBUG: Rendering media to {output_path} (codec: {codec})", flush=True)
 
                 await self.renderer.render_media(job.options, on_progress)
 
