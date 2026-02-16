@@ -32,6 +32,12 @@ RUN echo "=== Installing dependencies with Bun ===" && \
     echo "=== node_modules size ===" && \
     du -sh node_modules packages/*/node_modules 2>/dev/null | head -10
 
+# Build required packages (CLI needs to be built)
+RUN echo "=== Building required packages ===" && \
+    bun run --filter='@remotion/cli' make && \
+    bun run --filter='@remotion/bundler' make && \
+    echo "=== Required packages built ==="
+
 # Verify example package dependencies
 WORKDIR /app/packages/example
 RUN echo "=== Example package node_modules ===" && \
