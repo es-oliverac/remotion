@@ -160,7 +160,9 @@ class RenderQueue:
                     # No output path specified, generate one
                     output_path = storage.get_output_path(job.id, extension)
 
+                # Update BOTH output_path (snake_case) AND outputPath (camelCase)
                 job.options['output_path'] = output_path
+                job.options['outputPath'] = output_path  # Node.js reads this field
                 print(f"DEBUG: Rendering media to {output_path} (codec: {codec})", flush=True)
 
                 await self.renderer.render_media(job.options, on_progress)
