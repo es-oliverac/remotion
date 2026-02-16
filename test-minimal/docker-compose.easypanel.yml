@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  remotion-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: remotion-frontend
+    ports:
+      - "3001:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/bundle.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - remotion-network
+
+networks:
+  remotion-network:
+    driver: bridge
+    external: true
